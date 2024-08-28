@@ -1,0 +1,75 @@
+void store_param(Node *node) {
+    if (node->left && strcmp(node->left->node_type, "function")) {
+        if (!strcmp(node->left->node_type, "number")) {
+            param_stack[param_ct].data = node->left->data;
+            param_ct++;
+        }
+        store_param(node->left);
+    }
+    if (node->right && strcmp(node->right->node_type, "function")) {
+        if (!strcmp(node->right->node_type, "number")) {
+            param_stack[param_ct].data = node->right->data;
+            param_ct++;
+        }
+        store_param(node->right);
+    }
+    return;
+}
+
+void assign_param_data(Node *node) {
+    Node *cur;
+    if (node->left) {
+        if (!strcmp(node->left->node_type, "var")) {
+            node->left->is_in_func = 1;
+            var_stack[var_ct].is_in_func = 1;
+            var_stack[var_ct].id = node->left->id;
+            var_stack[var_ct].data = param_stack[param_ct].data;
+            var_ct++, param_ct++;
+        }
+        cur = node->left;
+        assign_param_data(cur);
+    }
+    if (node->right) {
+        if (!strcmp(node->right->node_type, "var")) {
+            node->right->is_in_func = 1;
+            var_stack[var_ct].is_in_func = 1;
+            var_stack[var_ct].id = node->right->id;
+            var_stack[var_ct].data = param_stack[param_ct].data;
+            var_ct++, param_ct++;
+        }
+        cur = node->right;
+        assign_param_data(cur);
+    }
+    return;
+}
+
+
+
+// def_and_func_call
+    else if (!strcmp(node->node_type, "def_and_func_call")) {
+        param_ct = 0;
+        store_param(node);
+        borrow_space = param_ct;
+        param_ct = 0;
+        assign_param_data(node);
+        AST_traversal(node->left);
+        AST_traversal(node->right);
+        node->is_boolean = node->left->right->is_boolean == 1 ? 1 : 0;
+        node->data = node->left->right->data;
+        var_ct -= borrow_space;
+    }
+
+
+    Node *root = NULL;
+    Node *func_stack[SIZE];
+
+    typedef struct buffer {
+        int data, is_in_func;
+        char* id;
+    } Buffer;
+
+    int var_ct = 0;
+    int borrow_space = 0;
+    Buffer param_stack[SIZE]; // in scope parameter
+    Buffer var_stack[SIZE]; // out scope
+
