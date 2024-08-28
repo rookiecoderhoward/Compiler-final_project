@@ -1,7 +1,7 @@
 # Mini-LISP interpreter
 
 ## 完成功能 :
-/* Basic Function */  
+### Basic Function
 Syntax Validation   
 Print  
 Numerical Operations   
@@ -13,7 +13,8 @@ Variable Definition
 ## 未完成功能 :
 /* Basic Function */  
 Function  
-Named Function   
+Named Function  
+
 /* Bonus */  
 Recursion  
 Type Checking -> 只有做檢測四則運算、布林運算  
